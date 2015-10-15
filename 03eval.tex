@@ -1,0 +1,9 @@
+\begin{enumerate}[i]
+\item The solution of this problem should provided 0/1 labels for each pixel in every frame of the test videos. Label 0 denotes this pixel represents the background in the current frame while label 1 denotes the foreground. We could measure the accuracy of the provided solution by comparing every predicted label against the ground truth of the test videos. A successful solution should provide prediction results should be no worse than the incremental EM solution in \cite{friedman1997image}.
+\item A incremental EM algorithm is mentioned in \cite{friedman1997image}.
+\item There are many existing background substraction datasets. We will deliver the original dataset used in \cite{friedman1997image} as training data to all the teams while use another dataset, the UCSD dataset\footnote{\url{http://www.svcl.ucsd.edu/projects/background_subtraction/ucsdbgsub_dataset.htm}} for evaluating the performance.
+\item The teams should load the video frames from disk and output all the labels for each video frame in a single text file. For example, when the video name is \texttt{A}, then the result for the 1st frame in \texttt{A} should be stored in \texttt{A1.txt}. The evaluation script should load all the labels from the text files and evaluate the predicted accuracy.
+\item In the first stage, all the delivered data and the test data will be sampled from the original video used in \cite{friedman1997image}. We sample a small portion of the video frames, say a sequence of $5\times5$ (or even smaller) patches, to be the training data to deliver. We then randomly sample another small portion of the video as the test data in the evaluation period. 
+    
+    In the second stage, we deliver the whole dataset in \cite{friedman1997image} to the teams and use the UCSD dataset as the final testing dataset. 
+\end{enumerate}
