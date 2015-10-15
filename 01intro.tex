@@ -1,0 +1,62 @@
+\newcommand{\secref}[1]{Section~\ref{#1}}
+\newcommand{\figref}[1]{Figure~\ref{#1}}
+\newcommand{\tabref}[1]{Table~\ref{#1}}
+\newcommand{\eqref}[1]{Equation~(\ref{#1})}
+
+\newcommand{\mbf}[1]{\mbox{{\bf #1}}}
+\newcommand{\smbf}[1]{\mbox{{\scriptsize\bf #1}}}
+\def\w{\mbf{w}}
+
+%\section{Introduction}
+{\centering\scriptsize\em
+  Substantial portions of this text are reproduced verbatim from an
+  author's paper~\cite{friedman:1997:uai}.}
+    
+{\bf Movement Detection from Video:} Finding and tracking moving
+objects is one of the main uses of vision.  For computer vision, the key
+subproblem of interest here is to first identify what part of each
+frame is due to movement (subsequently, separating into objects and
+tracking each across frames are also important subproblems).  In other
+words, the task is to decompose 
+each frame of video into two parts: all of the moving objects, and
+everything else.  Thankfully, in practice, approximate answers are
+good enough.
+
+For many years, the ``obvious'' approach has
+been first to compute some stationary {\em background image}, and then to
+identify the moving objects as those pixels in each frame that
+differ significantly from the background. We will call this the
+{\em background subtraction} approach. 
+The details of the method are described briefly in
+\secref{background-subtraction-section}.
+
+To pick one application, the Roadwatch project at Berkeley,
+background subtraction is overall an effective means of
+locating and tracking moving vehicles in freeway
+traffic~\cite{Koller+al:1994}.  However, it does perform poorly in
+some situations: long shadows and heavy traffic. 
+Shadows move, but treating them as real parts of the vehicles they
+overlap leads to many problems, starting with reliably separating each
+vehicle from one another.
+Moreover, background subtraction tends to treat any
+sufficiently slowly changing pixel as 
+`background', which is a problem in heavy traffic because vehicles
+then too often `disappear' (into the background).\footnote{Interestingly,
+  many real-life predators are also only able to see movement, so that
+  it is possible to hide from them just by freezing in place.}
+
+These problems arise from the oversimplified view of the
+task---detecting movement---that
+background subtraction takes: pixels can be neither background nor
+moving object.  In particular, background in shadow is not
+``background'' in the technical sense the approach needs.
+Using a simple three-class mixture model (``moving'', ``shadow'', and
+``background'') improves performance~\cite{friedman97uai}.  There may
+yet be further ways to improve performance, perhaps by applying more
+complicated probabilistic models.  For example, that work did not
+discuss nighttime traffic.  Much like shadows, the pixels brightened
+by vehicles' headlights would be misclassified as real parts of the
+vehicles; using a four-class model might further improve performance.
+
+
+
