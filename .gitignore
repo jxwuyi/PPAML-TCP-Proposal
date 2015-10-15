@@ -49,3 +49,5 @@ Temporary Items
 *.log
 *.out
 *.bak
+*.pdf
+*.dvi
