@@ -15,7 +15,7 @@
 %{\bf Movement Detection from Video:}
 Recognizing and tracking moving
 objects is one of the main uses of vision.
-For computer vision, we can start with merely identifying the
+For computer vision, we can start with `merely' identifying the
 foreground.
 %first identify what part of each
 %frame is due to moving objects.
@@ -34,12 +34,11 @@ differ significantly from the background. We will call this the
 {\em background subtraction} approach. 
 The details of the method are described briefly in
 \secref{background-subtraction-section}.
+
 To pick one application, the Roadwatch project at Berkeley,
 background subtraction is overall an effective means of
 locating and tracking moving vehicles in freeway
 traffic~\cite{Koller+al:1994}.
-
-
 However, in some important cases, background subtraction performs
 poorly at vehicle detection: long shadows and heavy traffic. 
 Shadows move, but treating them as real parts of the vehicles they
@@ -52,13 +51,14 @@ then too often disappear into the background.\footnote{Interestingly,
   many predators are also only able to see movement, so that
   it is possible to disappear just by freezing in place.}
 
-These problems arise from the oversimplified view of the
-task---detecting moving objects---that
+These problems are not specific to freeway monitoring, as they arise
+from the oversimplified view of the 
+general task---detecting moving objects---that
 background subtraction takes.  Namely, the approach assumes that
 background never changes and foreground always changes.  However,
 occasionally-variable background and occasionally-constant 
 foreground are also possible.  Handling those, when important, needs a
-more sophisticated approach; probabilistic techniques prove useful,
+more sophisticated approach; probabilistic techniques prove useful in practice,
 especially the use of Expectation-Maximization (EM)~\cite{Dempster+al:1977}.
 
 There is a large literature (several hundred papers in the last
@@ -75,14 +75,17 @@ Jepson and Black~\shortcite{Jepson+Black:1993}, Sawhney and
 Ayer~\shortcite{Sawhney+Ayer:1996}, and Weiss and
 Adelson~\shortcite{Weiss+Adelson:1996}.
 
+\subsection{PPAML Motivation}
+
 Interestingly, even just using a simple three-class (``background'', ``darkened'',
 ``occluded'') mixture model already significantly improves upon
 background subtraction for the Roadwatch application~\cite{friedman97uai}.  See
 \secref{shadow-and-background-subtraction-section} for a summary of
-that approach---which we take as baseline.  It is an interesting
-baseline firstly because it is a natural probabilistic generalization of the
-classical deterministic approach.
+that approach---which we take as baseline.
 
+The baseline is interesting firstly because it is a natural
+probabilistic generalization of the 
+classical deterministic approach.
 Secondly and more importantly of interest, significant further
 improvement should be possible, for example `just' developing and
 applying a more complicated probabilistic model should work.
@@ -94,6 +97,69 @@ feasibly investigate at that time.  A useful probabilistic programming
 system would allow a much broader investigation into possible models,
 by automating away some of the work presently required when working
 from a language with little to no special support for probability.
+
+
+\subsubsection{Reuse and Tuning}
+
+We expect any implementation to `work' on any video input, although
+its performance may be abysmal if some core assumptions are
+challenged.  For example, the baseline---and background
+subtraction---critically assumes a stationary camera.  A moving camera
+will provoke nonsense.
+
+Besides that, while motivated from freeway
+traffic, the baseline model and accompanying implementation  make few assumptions.
+For example, the model does not assume that all shadows have to point
+the same way.  We could have exploited that, and it would have yielded
+better segmentations on freeway traffic data.  However, that shadows point the same way is
+true only when precisely one light source is relevant.  A window in a
+white room is already a situation in which shadows do not behave
+simply.  Since we did not build in any such assumption about light
+sources, we expect that our model will perform equally at 
+identifying and ignoring shadows regardless of the number or geometry of light sources.
+
+We hope that
+any effort implementors put into optimizing for some specific
+assumptions about the kinds of videos that will be seen is easily
+adapted to work well for other situations.  Patient-monitoring in
+hospitals and facial-recognition at airports are two such potential applications
+where one might expect a foreground-detector trained on freeway data
+to still function reasonably well without further massive tuning/training.
+It would be interesting to see the results of such cross-domain
+application.  How much incremental work is needed by each PPS/team to get
+acceptable results as noncritical assumptions change?
+
+
+\subsubsection{Modularity}
+
+As demonstrated by the existing work, 
+reasonably effective performance on the problem is easy enough to
+achieve without relying on large, preexisting, machine vision
+implementations.  That is helpful for those probabilistic programming
+systems that limit callouts to other runtimes.
+
+At the same time, getting the segmentation nearly as correct as a
+human in every case has the same structure as presently typical
+CAPTCHAs: as complications/noise increase we expect machine vision
+systems to break down well before humans do when picking out
+objects in images and videos.  If aiming for that or similarly high
+levels of performance, then a PPS that permits reuse of
+preexisting implementations could easily demonstrate a significant
+advantage.
+
+
+\subsubsection{Space Efficiency}
+
+Video data is an interesting stress test of a PPS.  What is the
+overhead the system accrues when representing distributions over
+datastructures?  Likely too much by default, since uncompressed video is often large
+enough to stress test even deterministic languages.  It will be
+interesting to see what answers each PPS provides for working with
+models too big to entirely fit in memory all at once.  Is the effort
+required to control the PPS's memory overhead more or less than the
+effort required to implement probability theory in a deterministic
+language?
+
 
 
 %% To pick two
