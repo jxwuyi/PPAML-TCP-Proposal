@@ -10,9 +10,9 @@
 %\section{Introduction}
 %% {\centering\scriptsize\em
 %%   Substantial portions of this text are reproduced from an
-%%   author's paper~\cite{friedman:1997:uai}.}
+%%   author's paper~\cite{friedman1997image}.}
 
-%{\bf Movement Detection from Video:}
+{\bf Foreground/Background Video Segmentation:}
 Recognizing and tracking moving
 objects is one of the main uses of vision.
 For computer vision, we can start with `merely' identifying the
@@ -48,8 +48,8 @@ Moreover, background subtraction tends to treat any
 sufficiently slowly changing pixel as
 background, which is a problem in heavy traffic because vehicles
 then too often disappear into the background.\footnote{Interestingly,
-  many predators are also only able to see movement, so that
-  it is possible to disappear just by freezing in place.}
+  many natural predators are also only able to see movement, so that
+  freezing in place grants invisibility.}
 
 These problems are not specific to freeway monitoring, as they arise
 from the oversimplified view of the 
@@ -79,11 +79,11 @@ Adelson~\cite{Weiss+Adelson:1996}.
 
 Interestingly, even just using a simple three-class (``background'', ``darkened'',
 ``occluded'') mixture model already significantly improves upon
-background subtraction for the Roadwatch application~\cite{friedman97uai}.  See
+background subtraction for the Roadwatch application~\cite{friedman1997image}.  See
 \secref{shadow-and-background-subtraction-section} for a summary of
 that approach---which we take as baseline.
 
-The baseline is interesting firstly because it is a natural
+This baseline is interesting firstly because it is a natural
 probabilistic generalization of the 
 classical deterministic approach.
 Secondly and more importantly of interest, significant further
@@ -102,7 +102,7 @@ from a language with little to no special support for probability.
 \subsubsection{Reuse and Tuning}
 
 We expect any implementation to `work' on any video input, although
-its performance may be abysmal if some core assumptions are
+the quality of the segmentation may be abysmal when core assumptions are
 challenged.  For example, the baseline---and background
 subtraction---critically assumes a stationary camera.  A moving camera
 will provoke nonsense.
@@ -111,15 +111,15 @@ Besides that, while motivated from freeway
 traffic, the baseline model and accompanying implementation  make few assumptions.
 For example, the model does not assume that all shadows have to point
 the same way.  We could have exploited that, and it would have yielded
-better segmentations on freeway traffic data.  However, that shadows point the same way is
+better segmentations on freeway traffic data.  \Ignore{However, that shadows point the same way is
 true only when precisely one light source is relevant.  A window in a
 white room is already a situation in which shadows do not behave
-simply.  Since we did not build in any such assumption about light
-sources, we expect that our model will perform equally at 
+simply.}  Since we did not build in any such assumption about light
+sources, we expect that our model will perform the same at
 identifying and ignoring shadows regardless of the number or geometry of light sources.
 
 We hope that
-any effort implementors put into optimizing for some specific
+any effort implementors do put into optimizing for some specific
 assumptions about the kinds of videos that will be seen is easily
 adapted to work well for other situations.  Patient-monitoring in
 hospitals and facial-recognition at airports are two such potential applications
@@ -139,10 +139,10 @@ implementations.  That is helpful for those probabilistic programming
 systems that limit callouts to other runtimes.
 
 At the same time, getting the segmentation nearly as correct as a
-human in every case has the same structure as presently typical
-CAPTCHAs: as complications/noise increase we expect machine vision
-systems to break down well before humans do when picking out
-objects in images and videos.  If aiming for that or similarly high
+human in every case has roughly the same structure as presently typical
+CAPTCHAs (picking out objects in sufficiently complicated images and
+videos is considered human-feasible but computer-infeasible).
+If aiming for that or similarly high
 levels of performance, then a PPS that permits reuse of
 preexisting implementations could easily demonstrate a significant
 advantage.
@@ -152,11 +152,12 @@ advantage.
 
 Video data is an interesting stress test of a PPS.  What is the
 overhead the system accrues when representing distributions over
-datastructures?  Likely too much by default, since uncompressed video is often large
+datastructures?  Likely too much by default, since uncompressed video
+can be large
 enough to stress test even deterministic languages.  It will be
 interesting to see what answers each PPS provides for working with
 models too big to entirely fit in memory all at once.  Is the effort
-required to control the PPS's memory overhead more or less than the
+required to control the PPS's memory overhead more, or less, than the
 effort required to implement probability theory in a deterministic
 language?
 
@@ -185,218 +186,96 @@ language?
 \subsection{Foreground Video Segmentation}
 \label{sec:formal-problem}
 
+The goal is to take an input video and select a subset of each
+frame---ideally in real-time---corresponding to whatever the notion of
+``interesting'' is.  The selection of a subset of each frame is a
+\emph{segmentation} of the original video; the selected subset is the
+\emph{foreground} and its complement is the \emph{background}, the two
+together are the segmentation of the frame.
 
+Concretely, there are all sorts of hairy details to decide upon about the
+precise representation, storage, and transmisison of input videos and
+segmentations. In the online/real-time setting there are further details to
+decide upon, in particular, limits on maximum 
+and average latency (is 1 second too long?).
 
-\subsection{Background Subtraction}
-\label{background-subtraction-section}
+Abstractly, a video can be represented as a function $I(x,y,t)$ giving
+the value at time $t$ of the pixel at $(x,y)$.  The frames will be
+rectangular and fixed 
+size, so $x$ is in some set $\{0,1,\ldots,n\}$ and $y$ is in another
+$\{0,1,\ldots,m\}$.  The framerate will be constant, and so the domain
+of time is just $\{0,1,\ldots,T\}$.  The nature of pixel values
+(grayscale, RGB, HSV, CMYK, \ldots) will be specified and constant
+(probably red, green, blue).
 
-The roots of background subtraction go back to the 19th century, when
-it was shown that the background image could be obtained simply by
-exposing a film for a period of time much longer than the time
-required for moving objects to traverse the field of view. Thus, in
-its simplest form, the background image is the long-term average
-image:
-\[ B(x,y,t) = \frac{1}{t}\sum_{t'=1}^t I(x,y,t') \]
-where $I(x,y,t)$ is the instantaneous pixel value for the $(x,y)$
-pixel at time $t$. This can also be computed incrementally:
-\[B(x,y,t) = \frac{(t-1)}{t}B(x,y,t-1) + \frac{1}{t}I(x,y,t)\]
-The variance can also be computed incrementally, and moving
-objects can be identified by thresholding the Mahalanobis distance
-between $I(x,y,t)$ and $B(x,y,t)$.
+A segmentation can be represented as a mask, that is, as a function
+$M(x,y,t)$ onto either 0 or 1.  ``1'' means ``interesting''; so
+$M(150,60,70)=0$ is the assertion that, at time $70$, the pixel at
+$(150,60)$ is background according to segmentation $M$.
 
-One obvious problem with this approach is that lighting conditions
-change over time. This can be handled using a moving-window average,
-or, more efficiently, using exponential forgetting. In the latter
-scheme, each image's contribution to the background image is weighted
-so as to decrease exponentially as it recedes into the past. This is
-implemented by the update equation
-\begin{equation}
-B(x,y,t) = (1-\alpha)B(x,y,t-1) + \alpha I(x,y,t)
-\label{forgetting-equation}
-\end{equation}
-where $1/\alpha$ is the time constant of the forgetting process.
-Unlike the moving-window method, this requires no additional storage.
-Exponential forgetting is equivalent to using a Kalman filter to track
-the background image, as done in~\cite{Koller+al:1994}.
+It is often very useful, even necessary, to process video
+\emph{online}, which here means to pick the segmentation of the
+current frame in some bounded amount of time.  In that setting we
+can emphasize time by writing $I_t(x,y)=I(x,y,t)$
+for the current frame (the one at time $t$) and $M_t(x,y)=M(x,y,t)$
+for its segmentation.  A typical constraint on such algorithms is to
+compute an answer using only some bounded memory of the past: each
+$M_t$ should depend on only $I_{t-k},\ldots, I_t$ for some $k$.
 
+``Interesting'' will not be given an entirely formal
+definition; intuitively, the interesting things are the things that
+move.  But as mentioned, there are application-specific exceptions: a
+stopped vehicle is interesting, a shadow is not.
+A (partially?) labeled training set will exemplify the notion for
+whatever source of video is chosen.
+So the overall task is to both learn the concept (offline), and
+predict it (ideally online).
 
+A fully labeled training set is just some distinguished set of videos and
+corresponding segmentations, usually somewhat imperfect:
+$\{(I,M) \mid \text{$M$ is (probably, approximately) a correct
+  segmentation of $I$}\}$ is the form of a training set.
 
-
-\begin{figure*}[t]
-\centering
-\subfigure[a]{
-\includegraphics[width=0.31\textwidth]{figures/avg.0099.ps}
-}
-\subfigure[b]{
-\includegraphics[width=0.31\textwidth]{figures/img.0100.ps}
-}
-\subfigure[c]{
-\includegraphics[width=0.31\textwidth]{figures/mask.0100.ps}
-}
-\caption{(a) Background image computed during fast-moving traffic
-using exponential forgetting. (b) Current image (frame 100). (c) Thresholded
-difference image showing pixels associated with moving objects.}
-\label{fast-traffic-figure}
-\end{figure*}
-
-\figref{fast-traffic-figure} shows a typical result from the method
-operating under favourable conditions. Although there are a few stray
-pixels identified as ``moving'' due to image noise, the vehicles are
-outlined reasonably well. Standard methods can be used to group the
-pixels belonging to each vehicle and to compute and track a smoothed
-convex hull.
-
-The sharp-eyed reader will have spotted that the background
-subtraction method succeeds not only in detecting moving vehicles, but
-also their shadows.\footnote{Some of the road markings are also
-labelled as ``moving''---this is due to camera jitter.
-Also, the method fails to detect those parts of a moving vehicle that
-are approximately the same intensity as the background.
-Such problems are unavoidable in any pixel-based method.}
-In practice, shadows have been one of the most
-serious problems for video-based traffic surveillance in both
-commercial and research systems~\cite{Michalopoulos:1991}, sometimes
-resulting in undercounting or overcounting by as much as 50\%.  It
-might be thought that some simple fix such as lightening or
-thresholding might work to eliminate shadows, but these schemes may fail
-because parts of the road may be shadowed by buildings, and because of
-road markings---a shadow falling on a white line can still result in a
-brighter pixel than sunlight falling on tarmac~\cite{Kilger:1992}.
-
-As mentioned in the introduction, another serious problem arises when
-objects are slow-moving or temporarily stationary. Here, ``slow-moving''
-means that the time of
-traversal is non-negligible compared with $1/\alpha$,
-the time constant of the exponential forgetting process in
-\eqref{forgetting-equation}. When this happens,
-the background image becomes corrupted and object detection fails
-completely (\figref{slow-traffic-figure}).
-
-\begin{figure*}[t]
-\subfigure[a]{
-\includegraphics[width=0.31\textwidth]{figures/avg.0924.ps}
-}
-\subfigure[b]{
-\includegraphics[width=0.31\textwidth]{figures/img.0925.ps}
-}
-\subfigure[c]{
-\includegraphics[width=0.31\textwidth]{figures/mask.0925.ps}
-}
-\caption{(a) Background image computed during slow-moving traffic
-using exponential forgetting. (b) Current image (frame 925). (c) Thresholded
-difference image showing pixels associated with moving objects.}
-\label{slow-traffic-figure}
-\end{figure*}
-
-The solution used by Koller {\em et al.}~\shortcite{Koller+al:1994}
-was to update the background image with only those pixels
-{\em not} identified as moving objects. This is reasonably effective,
-but still has problems with very slow traffic because erroneous
-pixel classifications perturb the background image, which increases
-the number of erroneous classifications, and so on. Essentially, the
-distribution of pixels erroneously classified as non-moving is biased
-away from the true mean of the background image, causing
-instability in the process.
-
-Despite these problems, the idea behind that approach is
-essentially right: each pixel must be {\em classified} before being
-used to update the background model. The next section shows how this
-can be done properly, using a probabilistic classifier and a stable
-updating algorithm. This approach also solves the problem with shadows.
+The precise notion of quality of prediction will be specified, but in
+practice the most appropriate definition varies wildly.  Ideally each
+PPS will be able to easily adjust its behavior to suit a wide range of
+plausible performance metrics.
 
 
 
-\subsection{Probabilistic Shadow and Background Subtraction}
-\label{shadow-and-background-subtraction-section}
-\label{pixel-model-section}
 
 
-Consider a single pixel and the distribution of its values over time.
-Some of the time it will be in its ``normal'' background state---for
-example, a small area of the road surface. Some of the time it may be
-in the shadow of moving vehicles, and some of the time it may be part
-of a vehicle. Thus, in the case of traffic surveillance, we can think
-of the distribution of values $i_{x,y}$ of a pixel $(x,y)$ as the
-weighted sum of three distributions $r_{x,y}$ (road), $s_{x,y}$
-(shadow), and $v_{x,y}$ (vehicle):
-\[ i_{x,y} = \w_{x,y} \cdot (r_{x,y},\ s_{x,y},\ v_{x,y}) \]
-These distributions are subscripted
-to emphasize that they differ from pixel to pixel; $r_{x,y}$ is a
-probability distribution for the way that {\em this specific pixel}
-looks when it is showing unshadowed road at the corresponding physical
-location. It is essential to have different models for each pixels,
-because, for example, some parts of the image may correspond to white road
-markings, others to dark streaks in the centers of lanes, and still
-others to lamp-posts (see \figref{fast-traffic-figure}).
-The weights are also subscripted, because some pixels
-may spend more time in shadow or vehicle than others.
+%% Some systems/participants may want to communicate their uncertainty
+%% about the interesting subset of each frame.  That is difficult to---and
+%% we will not---accomodate, as there are too many ways to be uncertain.  For example,
+%% our baseline would prefer to assign a probability to each pixel
+%% (rather than 0/1).  Other approaches might want to consider spatial
+%% dependencies, for example by presenting a (perhaps weighted) set of
+%% sampled frames.  Still others might want to report a symbolic
+%% representation of a distribution over the present frame.  The truly
+%% ambituous consider also temporal dependencies (by working with
+%% distributions over whole segmentations).
 
-\begin{figure*}[t]
-\subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/intensity-freq.ps}
-}
-\subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/rgb-scatter.ps}
-}
-\subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/intensity-model.ps}
-}
-\subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/rgb-model.ps}
-}
-\caption{(a) Empirical distribution of intensity values for pixel (160,170)
-over 1000 frames. (b) Scatter plot of RGB values for the same pixel.
-(c) Fitted three-component Gaussian mixture model for the data in (a).
-(d) Scatter plot of 1000 randomly-generated data points from a fitted
-three-component Gaussian mixture model for the data in (b).}
-\label{pixel-model-figure}
-\end{figure*}
+%% For evaluation purposes, we settle on the simplest thing, which is to
+%% demand a single (most likely) estimate of each frame in turn.  Each
+%% will then be scored by its distance to the notionally correct answer,
+%% where ``distance'' will be some well-specified metric on frames (such
+%% as ``number of correct foreground pixels'').  The
+%% scores for each frame will then be aggregated in some specified
+%% fashion (averaging, maxing, or something more exotic).
+%% There is no
+%% way to reach consensus on the best possible scoring or aggregation
+%% functions (or even that the score of a segmentation should be any form
+%% of aggregration of per-frame scores); any particular application has
+%% its own peculiar set of consequences for being wrong.\footnote{It would be
+%% better, for example, to optimize the probability of identifying any
+%% fatal threat rather than to optimize the accuracy of ones estimate of
+%% the total number of moving objects.}
 
-Figures~\ref{pixel-model-figure}(a) and~\ref{pixel-model-figure}(b)
-show the empirical distribution of intensity and RGB values,
-respectively, for pixel (160,170), which is roughly two-thirds of the
-way towards the bottom right corner of the image.  These data display
-the behaviour one would expect: the shadow and road pixels form two
-fairly well-defined peaks, while the vehicle pixels are widely
-scattered.  As a first approximation, we assume that each distribution
-can be modelled as a Gaussian.  Using expectation maximization, we can fit three-component mixture models to the
-data. \figref{pixel-model-figure}(c) shows the fitted model for
-intensity values, and \figref{pixel-model-figure}(d) shows a scatter
-plot for the fitted RGB model. The fitted models are reasonably good
-(but far from ideal) approximations to the empirical data.
-
-%the techniques described in
-%\secref{EM-section},
-%%
-%% the label problem solution is in {results-section}
-%%
-
-The model for pixel $(x,y)$ is parameterized by the parameters $\Theta
-= \{
-w_l, \mu_l, \Sigma_l : l \in \{ r, s, v \}\}$ so that $\w_{x,y} = (w_r,
-w_s, w_v )$, $r_{x,y} \sim N(\mu_r,\Sigma_r)$, and so on.%
-\footnote{For clarity, we omit the subscript $x,y$ from the names of
-these parameters. However, it should be clear that there is a
-different set of parameters for pixel position $x,y$.}
-Our models apply in two settings. In the first, we examine intensity
-levels, and $\mu$ and $\Sigma$ are scalars. In the second, we examine
-RGB values, and $\mu$ is a $3\times 1$ vector and $\Sigma$ is a $3\times 3$
-matrix. The derivations are identical in the two cases, so we do not
-distinguish between them in the following discussion.
-
-Let $i$ be a pixel value (either an intensity level or a vector of RGB
-values). Let $L$ be a random variable denoting the {\em label\/} of
-the pixel in this image. Our model defines the probability that $L =
-l$ and $I(x,y,t) = i$ to be
-\begin{eqnarray*}
-\lefteqn{P( L = l, I(x,y,t) = i \mid \Theta ) = {}} \\
- & &  w_l \cdot
-(2\pi)^{-\frac{d}{2}}|\Sigma_l|^{-\frac{1}{2}} \exp\{-\frac{1}{2}(i -
-\mu_l)^T {\Sigma_l}^{-1} (i - \mu_l)\}
-\end{eqnarray*}
-where $d$ is the dimension of each pixel value (1 or 3 in our case).
-Given these probabilities, we can classify the pixel value. Namely, we
-choose the class $l$ with highest posterior  probability $P( L = l \mid I(x,y,t)) $.
+%% An interesting meta-evaluation is to assess how easily each 
+%% implementation can be adapted if the performance metric is changed.
+%% Is the language flexible enough to explicitly model not only the
+%% question, but also the full metric over wrong answers?
 
 
 
