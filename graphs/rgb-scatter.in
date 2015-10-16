@@ -1,0 +1,29 @@
+# gnuplot input file that produces window and .ps file
+
+set term X11 
+#set term dumb
+
+set data style points
+
+#set xrange [-25:100]
+#set yrange [0:1]
+
+set nokey
+
+set xlabel "red"
+set ylabel "green"
+set zlabel "blue"
+
+set parametric
+#set contour
+splot 'rgb-scatter.data' using 1:2:3
+	
+pause -1 "return to continue"
+
+set term postscript portrait "Times-Roman" 18
+set output "rgb-scatter.ps" 
+replot
+
+
+
+

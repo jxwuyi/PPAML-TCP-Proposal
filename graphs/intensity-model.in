@@ -1,0 +1,25 @@
+# gnuplot input file that produces window and .ps file
+
+set term X11 
+#set term dumb
+
+set data style lines
+
+set xrange [50:256]
+#set yrange [0:1]
+
+#set nokey
+
+set xlabel "Intensity value"
+set ylabel "Probability"
+plot 'intensity-model.data' using 1:2 title "mixture model", 'intensity-model.data' using 1:3 title "shadow model", 'intensity-model.data' using 1:4 title "road model", 'intensity-model.data' using 1:5 title "vehicle model"
+	
+pause -1 "return to continue"
+
+set term postscript portrait "Times-Roman" 18
+set output "intensity-model.ps" 
+replot
+
+
+
+

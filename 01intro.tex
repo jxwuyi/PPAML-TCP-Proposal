@@ -207,7 +207,15 @@ the background image becomes corrupted and object detection fails
 completely (\figref{slow-traffic-figure}).
 
 \begin{figure*}[t]
-\threefigbox{figures/avg.0924.ps}{figures/img.0925.ps}{figures/mask.0925.ps}
+\subfigure[a]{
+\includegraphics[width=0.31\textwidth]{figures/avg.0924.ps}
+}
+\subfigure[b]{
+\includegraphics[width=0.31\textwidth]{figures/img.0925.ps}
+}
+\subfigure[c]{
+\includegraphics[width=0.31\textwidth]{figures/mask.0925.ps}
+}
 \caption{(a) Background image computed during slow-moving traffic
 using exponential forgetting. (b) Current image (frame 925). (c) Thresholded
 difference image showing pixels associated with moving objects.}
@@ -258,7 +266,18 @@ The weights are also subscripted, because some pixels
 may spend more time in shadow or vehicle than others.
 
 \begin{figure*}[t]
-\fourfigbox{graphs/intensity-freq.ps}{graphs/rgb-scatter.ps}{graphs/intensity-model.ps}{graphs/rgb-model.ps}
+\subfigure[a]{
+\includegraphics[width=0.23\textwidth]{graphs/intensity-freq.ps}
+}
+\subfigure[a]{
+\includegraphics[width=0.23\textwidth]{graphs/rgb-scatter.ps}
+}
+\subfigure[a]{
+\includegraphics[width=0.23\textwidth]{graphs/intensity-model.ps}
+}
+\subfigure[a]{
+\includegraphics[width=0.23\textwidth]{graphs/rgb-model.ps}
+}
 \caption{(a) Empirical distribution of intensity values for pixel (160,170)
 over 1000 frames. (b) Scatter plot of RGB values for the same pixel.
 (c) Fitted three-component Gaussian mixture model for the data in (a).
