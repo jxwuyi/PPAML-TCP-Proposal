@@ -1,5 +1,92 @@
-\begin{enumerate}[i]
-\item Well......to be filled.....
-\item We have the highway traffic video frames used in \cite{friedman1997image}. These video frames could be published after the first stage of the evaluation period.
-\item I.... really do not know how to answer these questions.......
-\end{enumerate}
+
+The baseline implementation was made without support from a dedicated
+probabilistic programming system.  So it is certainly feasible for any
+team to implement a solution.  One could just ignore the special
+nature of a PPS---treat it like a deterministic language---and just repeat
+the prior work.
+
+As for us, our language and supporting implementation were designed specifically
+to aid redoing and improving the particular application of video segmentation to
+freeway data as well as to aid the many other real-world
+applications of probability that our principal investigator has worked
+on.
+
+Particularly BLOG's declarative format 
+is meant to permit rapid investigation of differing models without
+having to spend any significant time, especially human time, on
+customizing the inference strategy/implementation to the model.  That
+is, in our experience, both in general and on the particular task of
+segmenting video, iterating on the model chosen is usually much more
+effective than `fussing' with the details of the implementation of
+inference. 
+
+To contrast, procedural languages
+shine when the right model is relatively obvious, but large or
+otherwise difficult to solve. Chess, for example, is easy to model but hard to
+solve.  Many real-world applications, including video segmentation,
+have the entirely opposite character of being difficult to model well,
+but, once found, good enough models are easy enough to solve.
+
+
+\paragraph{Data}
+Any publicly available video feed from a stationary camera is enough
+to get started, and there are plenty of those.  If publishing
+recordings of humans runs into legal troubles, it would be enough to,
+for example, point a camera at an acquarium and make the task be one
+of detecting fish.\footnote{Detecting fish raises an interesting
+  computational point
+  not encountered in freeway traffic data: if plants and currents are
+  boring, then 
+  a plant moving due to 
+  current is still boring.  Conversely, if plants are interesting,
+  then even never-moving plants are still ``foreground''.}
+The only tricky thing with video is that it is usually far too
+time-consuming to have a human label every pixel of an entire video.
+That primarily raises questions about the nature and reproduciblity of
+evaluation.  It becomes a data availability issue when the test itself
+is kept secret, and there are several scenarios where that is
+desirable or necessary.
+
+
+%% There are several standard workarounds, each with problems.  One is to have an
+%% independent judge pick some tiny fraction of the possible test
+%% questions.  That is, pick some
+%% interesting and tiny subset of contestant-unseen pixels, label them,
+%% and score the contestants for their labels of just those pixels.  It
+%% is easy to skew the results by careful selection, which is why the
+%% independence of the judge is important.  It is also difficult to ever
+%% reproduce the full challenge.  If the test questions and labels are
+%% kept secret, then reproducibility is immediately out the window.  If
+%% published after the competition, then the scores can be independently
+%% verified, but the full nature of the challenge cannot be repeated
+%% (since absence of foreknowledge of the test questions is key to making
+%% this an interesting way to evaluate systems).
+
+%% Another workaround is to generate synthetic data, so that ground truth
+%% is known with absolute certainty.  The standard complaint is that it
+%% is easy to generate synthetic data that is too clean, or noisy in the
+%% wrong way.
+
+%% Yet another workaround is to pick one particular system as the gold
+%% standard, its only flaw being that executing it is usually
+%% prohibitively costly.  (Humans as experts could be viewed as a limiting case of
+%% `too expensive to execute'.)  One avenue we are considering is to use
+%% Robust PCA as the gold standard; the submitted solutions then have to
+%% demonstrate some substantial computational advantage over that method.
+
+\paragraph{Risks}
+There are no obvious significant risks.
+It should be easy to settle the details such that running this
+challenge only has the systems passively observing and quietly
+inferring; taking no action besides using up
+electricity should presumably be considered to have no serious risks.\footnote{The paranoid can imagine a fire breaking out in a server room during,
+and perhaps partially due to, the computation.  Bleeding hearts can
+agonize over the possibility that the massive computation is the last
+straw that pushes a major city into a sustained brownout, during which
+electrically-dependent humans would die.}
+Implausibly, if---to obtain
+labeled traffic data---one instruments many drivers and set them to
+driving they would not otherwise be doing, then there are risks and
+liability concerns should two collide.  (But there is no reason to
+insist upon traffic data in the first place.)
+
