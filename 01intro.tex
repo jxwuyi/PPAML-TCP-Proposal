@@ -4,6 +4,7 @@
 \renewcommand{\eqref}[1]{Equation~(\ref{#1})}
 
 \newcommand{\mbf}[1]{\mbox{{\bf #1}}}
+\newcommand{\shortcite}{\cite}
 \newcommand{\smbf}[1]{\mbox{{\scriptsize\bf #1}}}
 \def\w{\mbf{w}}
 
@@ -52,7 +53,7 @@ then too often disappear into the background.\footnote{Interestingly,
   freezing in place grants invisibility.}
 
 These problems are not specific to freeway monitoring, as they arise
-from the oversimplified view of the 
+from the oversimplified view of the
 general task---detecting moving objects---that
 background subtraction takes.  Namely, the approach assumes that
 background never changes and foreground always changes.  However,
@@ -111,10 +112,7 @@ Besides that, while motivated from freeway
 traffic, the baseline model and accompanying implementation  make few assumptions.
 For example, the model does not assume that all shadows have to point
 the same way.  We could have exploited that, and it would have yielded
-better segmentations on freeway traffic data.  \Ignore{However, that shadows point the same way is
-true only when precisely one light source is relevant.  A window in a
-white room is already a situation in which shadows do not behave
-simply.}  Since we did not build in any such assumption about light
+better segmentations on freeway traffic data.  Since we did not build in any such assumption about light
 sources, we expect that our model will perform the same at
 identifying and ignoring shadows regardless of the number or geometry of light sources.
 
@@ -132,7 +130,7 @@ acceptable results as noncritical assumptions change?
 
 \subsubsection{Modularity}
 
-As demonstrated by the existing work, 
+As demonstrated by the existing work,
 reasonably effective performance on the problem is easy enough to
 achieve without relying on large, preexisting, machine vision
 implementations.  That is helpful for those probabilistic programming
@@ -276,6 +274,4 @@ plausible performance metrics.
 %% implementation can be adapted if the performance metric is changed.
 %% Is the language flexible enough to explicitly model not only the
 %% question, but also the full metric over wrong answers?
-
-
 

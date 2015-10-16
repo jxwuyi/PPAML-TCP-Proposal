@@ -15,111 +15,6 @@
 \end{enumerate}
 
 
-
-\subsection{Background Subtraction}
-\label{background-subtraction-section}
-
-{\em\centering This and the following section is an excerpt from prior
-  work~\cite{friedman1997image}.}
-
-The roots of background subtraction go back to the 19th century, when
-it was shown that the background image could be obtained simply by
-exposing a film for a period of time much longer than the time
-required for moving objects to traverse the field of view. Thus, in
-its simplest form, the background image is the long-term average
-image:
-\[ B(x,y,t) = \frac{1}{t}\sum_{t'=1}^t I(x,y,t') \]
-where $I(x,y,t)$ is the instantaneous pixel value for the $(x,y)$
-pixel at time $t$. This can also be computed incrementally:
-\[B(x,y,t) = \frac{(t-1)}{t}B(x,y,t-1) + \frac{1}{t}I(x,y,t)\]
-The variance can also be computed incrementally, and moving
-objects can be identified by thresholding the Mahalanobis distance
-between $I(x,y,t)$ and $B(x,y,t)$.
-
-One obvious problem with this approach is that lighting conditions
-change over time. This can be handled using a moving-window average,
-or, more efficiently, using exponential forgetting. In the latter
-scheme, each image's contribution to the background image is weighted
-so as to decrease exponentially as it recedes into the past. This is
-implemented by the update equation
-\begin{equation}
-B(x,y,t) = (1-\alpha)B(x,y,t-1) + \alpha I(x,y,t)
-\label{forgetting-equation}
-\end{equation}
-where $1/\alpha$ is the time constant of the forgetting process.
-Unlike the moving-window method, this requires no additional storage.
-Exponential forgetting is equivalent to using a Kalman filter to track
-the background image, as done in~\cite{Koller+al:1994}.
-
-
-
-
-\begin{figure*}[t]
-\centering
-\subfigure[a]{
-\includegraphics[width=0.31\textwidth]{figures/avg.0099.ps}
-}
-\subfigure[b]{
-\includegraphics[width=0.31\textwidth]{figures/img.0100.ps}
-}
-\subfigure[c]{
-\includegraphics[width=0.31\textwidth]{figures/mask.0100.ps}
-}
-\caption{(a) Background image computed during fast-moving traffic
-using exponential forgetting. (b) Current image (frame 100). (c) Thresholded
-difference image showing pixels associated with moving objects.}
-\label{fast-traffic-figure}
-\end{figure*}
-
-\figref{fast-traffic-figure} shows a typical result from the method
-operating under favourable conditions. Although there are a few stray
-pixels identified as ``moving'' due to image noise, the vehicles are
-outlined reasonably well. Standard methods can be used to group the
-pixels belonging to each vehicle and to compute and track a smoothed
-convex hull.
-
-The sharp-eyed reader will have spotted that the background
-subtraction method succeeds not only in detecting moving vehicles, but
-also their shadows.\footnote{Some of the road markings are also
-labelled as ``moving''---this is due to camera jitter.
-Also, the method fails to detect those parts of a moving vehicle that
-are approximately the same intensity as the background.
-Such problems are unavoidable in any pixel-based method.}
-In practice, shadows have been one of the most
-serious problems for video-based traffic surveillance in both
-commercial and research systems~\cite{Michalopoulos:1991}, sometimes
-resulting in undercounting or overcounting by as much as 50\%.  It
-might be thought that some simple fix such as lightening or
-thresholding might work to eliminate shadows, but these schemes may fail
-because parts of the road may be shadowed by buildings, and because of
-road markings---a shadow falling on a white line can still result in a
-brighter pixel than sunlight falling on tarmac~\cite{Kilger:1992}.
-
-As mentioned in the introduction, another serious problem arises when
-objects are slow-moving or temporarily stationary. Here, ``slow-moving''
-means that the time of
-traversal is non-negligible compared with $1/\alpha$,
-the time constant of the exponential forgetting process in
-\eqref{forgetting-equation}. When this happens,
-the background image becomes corrupted and object detection fails
-completely (\figref{slow-traffic-figure}).
-
-\begin{figure*}[t]
-\subfigure[a]{
-\includegraphics[width=0.31\textwidth]{figures/avg.0924.ps}
-}
-\subfigure[b]{
-\includegraphics[width=0.31\textwidth]{figures/img.0925.ps}
-}
-\subfigure[c]{
-\includegraphics[width=0.31\textwidth]{figures/mask.0925.ps}
-}
-\caption{(a) Background image computed during slow-moving traffic
-using exponential forgetting. (b) Current image (frame 925). (c) Thresholded
-difference image showing pixels associated with moving objects.}
-\label{slow-traffic-figure}
-\end{figure*}
-
 As it turns out, a solution to both difficulties is to first
 \emph{classify} and then \emph{selectively update}.  Roughly, only
 updating the background image with those pixels presently classified as
@@ -132,6 +27,8 @@ the math fully determines, by Bayes Rule, the optimal classification
 given observed values.  In practice the implementation must
 cut some corners for the sake of feasibility, the details of that are
 in the original paper~\cite{friedman1997image}. 
+
+
 
 
 \subsection{Probabilistic Shadow and Background Subtraction}
@@ -161,16 +58,16 @@ may spend more time in shadow or vehicle than others.
 
 \begin{figure*}[t]
 \subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/intensity-freq.ps}
+\includegraphics[width=0.23\textwidth]{graphs/intensity-freq.pdf}
 }
 \subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/rgb-scatter.ps}
+\includegraphics[width=0.23\textwidth]{graphs/rgb-scatter.pdf}
 }
 \subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/intensity-model.ps}
+\includegraphics[width=0.23\textwidth]{graphs/intensity-model.pdf}
 }
 \subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/rgb-model.ps}
+\includegraphics[width=0.23\textwidth]{graphs/rgb-model.pdf}
 }
 \caption{(a) Empirical distribution of intensity values for pixel (160,170)
 over 1000 frames. (b) Scatter plot of RGB values for the same pixel.
@@ -225,3 +122,4 @@ l$ and $I(x,y,t) = i$ to be
 where $d$ is the dimension of each pixel value (1 or 3 in our case).
 Given these probabilities, we can classify the pixel value. Namely, we
 choose the class $l$ with highest posterior  probability $P( L = l \mid I(x,y,t)) $.
+
