@@ -4,6 +4,7 @@
 \renewcommand{\eqref}[1]{Equation~(\ref{#1})}
 
 \newcommand{\mbf}[1]{\mbox{{\bf #1}}}
+\newcommand{\shortcite}{\cite}
 \newcommand{\smbf}[1]{\mbox{{\scriptsize\bf #1}}}
 \def\w{\mbf{w}}
 
@@ -52,7 +53,7 @@ then too often disappear into the background.\footnote{Interestingly,
   it is possible to disappear just by freezing in place.}
 
 These problems are not specific to freeway monitoring, as they arise
-from the oversimplified view of the 
+from the oversimplified view of the
 general task---detecting moving objects---that
 background subtraction takes.  Namely, the approach assumes that
 background never changes and foreground always changes.  However,
@@ -84,7 +85,7 @@ background subtraction for the Roadwatch application~\cite{friedman97uai}.  See
 that approach---which we take as baseline.
 
 The baseline is interesting firstly because it is a natural
-probabilistic generalization of the 
+probabilistic generalization of the
 classical deterministic approach.
 Secondly and more importantly of interest, significant further
 improvement should be possible, for example `just' developing and
@@ -115,7 +116,7 @@ better segmentations on freeway traffic data.  However, that shadows point the s
 true only when precisely one light source is relevant.  A window in a
 white room is already a situation in which shadows do not behave
 simply.  Since we did not build in any such assumption about light
-sources, we expect that our model will perform equally at 
+sources, we expect that our model will perform equally at
 identifying and ignoring shadows regardless of the number or geometry of light sources.
 
 We hope that
@@ -132,7 +133,7 @@ acceptable results as noncritical assumptions change?
 
 \subsubsection{Modularity}
 
-As demonstrated by the existing work, 
+As demonstrated by the existing work,
 reasonably effective performance on the problem is easy enough to
 achieve without relying on large, preexisting, machine vision
 implementations.  That is helpful for those probabilistic programming
@@ -225,13 +226,13 @@ the background image, as done in~\cite{Koller+al:1994}.
 \begin{figure*}[t]
 \centering
 \subfigure[a]{
-\includegraphics[width=0.31\textwidth]{figures/avg.0099.ps}
+\includegraphics[width=0.31\textwidth]{figures/avg0099.pdf}
 }
 \subfigure[b]{
-\includegraphics[width=0.31\textwidth]{figures/img.0100.ps}
+\includegraphics[width=0.31\textwidth]{figures/img0100.pdf}
 }
 \subfigure[c]{
-\includegraphics[width=0.31\textwidth]{figures/mask.0100.ps}
+\includegraphics[width=0.31\textwidth]{figures/mask0100.pdf}
 }
 \caption{(a) Background image computed during fast-moving traffic
 using exponential forgetting. (b) Current image (frame 100). (c) Thresholded
@@ -274,13 +275,13 @@ completely (\figref{slow-traffic-figure}).
 
 \begin{figure*}[t]
 \subfigure[a]{
-\includegraphics[width=0.31\textwidth]{figures/avg.0924.ps}
+\includegraphics[width=0.31\textwidth]{figures/avg0924.pdf}
 }
 \subfigure[b]{
-\includegraphics[width=0.31\textwidth]{figures/img.0925.ps}
+\includegraphics[width=0.31\textwidth]{figures/img0925.pdf}
 }
 \subfigure[c]{
-\includegraphics[width=0.31\textwidth]{figures/mask.0925.ps}
+\includegraphics[width=0.31\textwidth]{figures/mask0925.pdf}
 }
 \caption{(a) Background image computed during slow-moving traffic
 using exponential forgetting. (b) Current image (frame 925). (c) Thresholded
@@ -333,16 +334,16 @@ may spend more time in shadow or vehicle than others.
 
 \begin{figure*}[t]
 \subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/intensity-freq.ps}
+\includegraphics[width=0.23\textwidth]{graphs/intensity-freq.pdf}
 }
 \subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/rgb-scatter.ps}
+\includegraphics[width=0.23\textwidth]{graphs/rgb-scatter.pdf}
 }
 \subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/intensity-model.ps}
+\includegraphics[width=0.23\textwidth]{graphs/intensity-model.pdf}
 }
 \subfigure[a]{
-\includegraphics[width=0.23\textwidth]{graphs/rgb-model.ps}
+\includegraphics[width=0.23\textwidth]{graphs/rgb-model.pdf}
 }
 \caption{(a) Empirical distribution of intensity values for pixel (160,170)
 over 1000 frames. (b) Scatter plot of RGB values for the same pixel.
