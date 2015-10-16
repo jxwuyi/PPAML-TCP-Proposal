@@ -1,0 +1,25 @@
+# gnuplot input file that produces window and .ps file
+
+set term X11 
+#set term dumb
+
+set data style linespoints
+
+set xrange [50:255]
+#set yrange [0:1]
+
+set nokey
+
+set xlabel "Intensity value"
+set ylabel "Frequency"
+plot 'intensity-freq.data' using 1:2
+	
+pause -1 "return to continue"
+
+set term postscript portrait "Times-Roman" 18
+set output "intensity-freq.ps" 
+replot
+
+
+
+

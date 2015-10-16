@@ -1,4 +1,3 @@
-
 The baseline implementation was made without support from a dedicated
 probabilistic programming system.  So it is certainly feasible for any
 team to implement a solution.  One could just ignore the special
@@ -30,8 +29,12 @@ but, once found, good enough models are easy enough to solve.
 
 \paragraph{Data}
 Any publicly available video feed from a stationary camera is enough
-to get started, and there are plenty of those.  If publishing
-recordings of humans runs into legal troubles, it would be enough to,
+to get started, and there are plenty of those.
+For example, UCSD has published such video.\footnote{\url{http://www.svcl.ucsd.edu/projects/background_subtraction/ucsdbgsub_dataset.htm}}
+Of course, available to view and legally allowed to modify and republish are not
+exactly the same thing, particularly for recordings of humans.  If 
+publishing or using recordings of humans runs into such legal troubles,
+it would be enough to, 
 for example, point a camera at an acquarium and make the task be one
 of detecting fish.\footnote{Detecting fish raises an interesting
   computational point
@@ -40,13 +43,14 @@ of detecting fish.\footnote{Detecting fish raises an interesting
   a plant moving due to 
   current is still boring.  Conversely, if plants are interesting,
   then even never-moving plants are still ``foreground''.}
-The only tricky thing with video is that it is usually far too
+Really the only tricky thing with video is that it is usually far too
 time-consuming to have a human label every pixel of an entire video.
 That primarily raises questions about the nature and reproduciblity of
-evaluation.  It becomes a data availability issue when the test itself
-is kept secret, and there are several scenarios where that is
-desirable or necessary.
-
+evaluation, but it can become a data availability issue when the test itself
+is kept secret. A combination of tests may be ideal, so that at least
+some are easily published.  For 
+example, we could generate synthetic data; releasing source code
+(after the evaluation period) to a generator raises no concerns.
 
 %% There are several standard workarounds, each with problems.  One is to have an
 %% independent judge pick some tiny fraction of the possible test
