@@ -8,19 +8,24 @@
 \def\w{\mbf{w}}
 
 %\section{Introduction}
-{\centering\scriptsize\em
-  Substantial portions of this text are reproduced verbatim from an
-  author's paper~\cite{friedman:1997:uai}.}
-    
-{\bf Movement Detection from Video:} Finding and tracking moving
-objects is one of the main uses of vision.  For computer vision, the key
-subproblem of interest here is to first identify what part of each
-frame is due to movement (subsequently, separating into objects and
-tracking each across frames are also important subproblems).  In other
-words, the task is to decompose 
+%% {\centering\scriptsize\em
+%%   Substantial portions of this text are reproduced from an
+%%   author's paper~\cite{friedman:1997:uai}.}
+
+%{\bf Movement Detection from Video:}
+Recognizing and tracking moving
+objects is one of the main uses of vision.
+For computer vision, we can start with merely identifying the
+foreground.
+%first identify what part of each
+%frame is due to moving objects.
+%(subsequently, separating and tracking
+%individuals across frames are also important subproblems)
+That is, the task here is to decompose 
 each frame of video into two parts: all of the moving objects, and
 everything else.  Thankfully, in practice, approximate answers are
-good enough.
+good enough.  \secref{sec:formal-problem} formally defines the problem,
+but first, some background. 
 
 For many years, the ``obvious'' approach has
 been first to compute some stationary {\em background image}, and then to
@@ -29,34 +34,71 @@ differ significantly from the background. We will call this the
 {\em background subtraction} approach. 
 The details of the method are described briefly in
 \secref{background-subtraction-section}.
-
 To pick one application, the Roadwatch project at Berkeley,
 background subtraction is overall an effective means of
 locating and tracking moving vehicles in freeway
-traffic~\cite{Koller+al:1994}.  However, it does perform poorly in
-some situations: long shadows and heavy traffic. 
+traffic~\cite{Koller+al:1994}.
+
+However, in some important cases, background subtraction performs
+poorly at vehicle detection: long shadows and heavy traffic. 
 Shadows move, but treating them as real parts of the vehicles they
 overlap leads to many problems, starting with reliably separating each
 vehicle from one another.
 Moreover, background subtraction tends to treat any
 sufficiently slowly changing pixel as 
-`background', which is a problem in heavy traffic because vehicles
-then too often `disappear' (into the background).\footnote{Interestingly,
-  many real-life predators are also only able to see movement, so that
-  it is possible to hide from them just by freezing in place.}
+background, which is a problem in heavy traffic because vehicles
+then too often disappear into the background.\footnote{Interestingly,
+  many predators are also only able to see movement, so that
+  it is possible to disappear just by freezing in place.}
 
 These problems arise from the oversimplified view of the
-task---detecting movement---that
-background subtraction takes: pixels can be neither background nor
-moving object.  In particular, background in shadow is not
-``background'' in the technical sense the approach needs.
-Using a simple three-class mixture model (``moving'', ``shadow'', and
-``background'') improves performance~\cite{friedman97uai}.  There may
-yet be further ways to improve performance, perhaps by applying more
-complicated probabilistic models.  For example, that work did not
-discuss nighttime traffic.  Much like shadows, the pixels brightened
-by vehicles' headlights would be misclassified as real parts of the
-vehicles; using a four-class model might further improve performance.
+task---detecting moving objects---that
+background subtraction takes.  Namely, the approach assumes that
+background never changes and foreground always changes.  However,
+occasionally-variable background and occasionally-constant 
+foreground are also possible.
 
+
+Probabilistic techniques prove useful in developing a more
+sophisticated approach.
+Even just using a simple three-class (``background'', ``darkened'',
+``occluded'') mixture model already significantly improves upon
+background subtraction~\cite{friedman97uai}.  See
+\secref{shadow-and-background-subtraction-section} for a summary of
+that approach---which we take as baseline. 
+Significant further improvement should be possible, perhaps
+by applying more complicated probabilistic models.
+
+
+%% To pick two
+%% potential flaws of the reference work: it fails to consider nighttime
+%% and deliberately ignores contiguity.
+%% Much like shadows, the pixels brightened
+%% by vehicles' headlights are easily misclassified as real parts of the
+%% vehicles.  Using four classes
+%% (``background'', ``brightened'', ``darkened'', ``occluded'') could help.
+%% The reference work can be confused by a gray vehicle driving over a
+%% gray manhole: it can mistakenly imagine that the manhole remains
+%% visible when the vehicle drives over it.  Adding probabilistic contiguity
+%% constraints would combat that and many related potential flaws.
+
+
+
+
+
+\subsection{Notation}
+\label{sec:notation}
+
+
+\subsection{Foreground Video Segmentation}
+\label{sec:formal-problem}
+
+\subsection{Background Subtraction}
+\label{background-subtraction-section}
+
+
+
+\subsection{Probabilistic Shadow and Background Subtraction}
+\label{shadow-and-background-subtraction-section}
 
 
