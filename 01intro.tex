@@ -1,7 +1,7 @@
 \newcommand{\secref}[1]{Section~\ref{#1}}
 \newcommand{\figref}[1]{Figure~\ref{#1}}
 \newcommand{\tabref}[1]{Table~\ref{#1}}
-\newcommand{\eqref}[1]{Equation~(\ref{#1})}
+\renewcommand{\eqref}[1]{Equation~(\ref{#1})}
 
 \newcommand{\mbf}[1]{\mbox{{\bf #1}}}
 \newcommand{\smbf}[1]{\mbox{{\scriptsize\bf #1}}}
@@ -21,17 +21,17 @@ foreground.
 %frame is due to moving objects.
 %(subsequently, separating and tracking
 %individuals across frames are also important subproblems)
-That is, the task here is to decompose 
+That is, the task here is to decompose
 each frame of video into two parts: all of the moving objects, and
 everything else.  Thankfully, in practice, approximate answers are
 good enough.  \secref{sec:formal-problem} formally defines the problem,
-but first, some background. 
+but first, some background.
 
 For many years, the ``obvious'' approach has
 been first to compute some stationary {\em background image}, and then to
 identify the moving objects as those pixels in each frame that
 differ significantly from the background. We will call this the
-{\em background subtraction} approach. 
+{\em background subtraction} approach.
 The details of the method are described briefly in
 \secref{background-subtraction-section}.
 To pick one application, the Roadwatch project at Berkeley,
@@ -41,12 +41,12 @@ traffic~\cite{Koller+al:1994}.
 
 
 However, in some important cases, background subtraction performs
-poorly at vehicle detection: long shadows and heavy traffic. 
+poorly at vehicle detection: long shadows and heavy traffic.
 Shadows move, but treating them as real parts of the vehicles they
 overlap leads to many problems, starting with reliably separating each
 vehicle from one another.
 Moreover, background subtraction tends to treat any
-sufficiently slowly changing pixel as 
+sufficiently slowly changing pixel as
 background, which is a problem in heavy traffic because vehicles
 then too often disappear into the background.\footnote{Interestingly,
   many predators are also only able to see movement, so that
@@ -56,7 +56,7 @@ These problems arise from the oversimplified view of the
 task---detecting moving objects---that
 background subtraction takes.  Namely, the approach assumes that
 background never changes and foreground always changes.  However,
-occasionally-variable background and occasionally-constant 
+occasionally-variable background and occasionally-constant
 foreground are also possible.  Handling those, when important, needs a
 more sophisticated approach; probabilistic techniques prove useful,
 especially the use of Expectation-Maximization (EM)~\cite{Dempster+al:1977}.
@@ -70,10 +70,10 @@ range finders, synthetic aperture radar, magnetic resonance imaging, PET, micros
 X-rays.  Almost without exception, EM is used to identify classes of
 pixels within an image or classes of motions within an optical flow
 field, on the assumption that similar pixels can be grouped
-together. Typical examples include Samadani~\shortcite{Samadani:1995},
-Jepson and Black~\shortcite{Jepson+Black:1993}, Sawhney and
-Ayer~\shortcite{Sawhney+Ayer:1996}, and Weiss and
-Adelson~\shortcite{Weiss+Adelson:1996}.
+together. Typical examples include Samadani~\cite{Samadani:1995},
+Jepson and Black~\cite{Jepson+Black:1993}, Sawhney and
+Ayer~\cite{Sawhney+Ayer:1996}, and Weiss and
+Adelson~\cite{Weiss+Adelson:1996}.
 
 Interestingly, even just using a simple three-class (``background'', ``darkened'',
 ``occluded'') mixture model already significantly improves upon
@@ -157,7 +157,16 @@ the background image, as done in~\cite{Koller+al:1994}.
 
 
 \begin{figure*}[t]
-\threefigbox{figures/avg.0099.ps}{figures/img.0100.ps}{figures/mask.0100.ps}
+\centering
+\subfigure[a]{
+\includegraphics[width=0.31\textwidth]{figures/avg.0099.ps}
+}
+\subfigure[b]{
+\includegraphics[width=0.31\textwidth]{figures/img.0100.ps}
+}
+\subfigure[c]{
+\includegraphics[width=0.31\textwidth]{figures/mask.0100.ps}
+}
 \caption{(a) Background image computed during fast-moving traffic
 using exponential forgetting. (b) Current image (frame 100). (c) Thresholded
 difference image showing pixels associated with moving objects.}
